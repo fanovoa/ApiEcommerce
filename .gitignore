@@ -1,0 +1,101 @@
+########################################
+# Compilación / Build
+########################################
+bin/
+obj/
+out/
+
+########################################
+# Archivos de usuario / IDE
+########################################
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+########################################
+# Visual Studio Code
+########################################
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+########################################
+# JetBrains Rider
+########################################
+.idea/
+*.sln.iml
+
+########################################
+# Logs
+########################################
+*.log
+
+########################################
+# Test Results
+########################################
+TestResults/
+coverage/
+coverage.cobertura.xml
+
+########################################
+# NuGet
+########################################
+*.nupkg
+*.snupkg
+.nuget/packages/
+.nuget/temp/
+.nuget/cache/
+
+########################################
+# Publicación
+########################################
+publish/
+*.publishsettings
+*.pubxml
+*.pubxml.user
+
+########################################
+# Azure / IIS
+########################################
+appsettings.Development.json
+appsettings.Local.json
+
+########################################
+# Secrets (MUY IMPORTANTE)
+########################################
+secrets.json
+*.pfx
+*.pem
+*.key
+
+########################################
+# OS
+########################################
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+########################################
+# Archivos temporales
+########################################
+*.tmp
+*.bak
+*.swp
+*~
+
+########################################
+# Entity Framework
+########################################
+Migrations/*.cs
+!Migrations/*ContextModelSnapshot.cs
+
+########################################
+# DotNet tools
+########################################
+.dotnet/
