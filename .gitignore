@@ -14,6 +14,8 @@ out/
 *.suo
 *.userosscache
 *.sln.docstates
+*.suo
+*.futdcache.v2
 
 ########################################
 # Visual Studio Code

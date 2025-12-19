@@ -10,8 +10,11 @@ public class CateegoryRepository(ApplicationDbContext dbContext) : ICategoryRepo
 
     public bool CategoryExists(int id) =>  _dbContext.Categories.Any(category => category.Id == id);
     
-
     public bool CategoryExists(string name) =>  _dbContext.Categories.Any(category => category.Name.ToLower().Trim() == name.ToLower().Trim());
+    
+    public IReadOnlyCollection<Category> GetCategories() => [.. _dbContext.Categories.OrderBy( category => category.Name)];
+
+    public bool Save() => _dbContext.SaveChanges() >= 0;
     
     public bool CreateCategory(Category category)
     {
@@ -26,17 +29,10 @@ public class CateegoryRepository(ApplicationDbContext dbContext) : ICategoryRepo
         return Save();
     }
 
-    public IReadOnlyCollection<Category> GetCategories() => [.. _dbContext.Categories.OrderBy( category => category.Name)];
-    
-
-    public Category GetCategory(int id)
+    public Category? GetCategory(int id)
     {
-        return _dbContext.Categories.FirstOrDefault(category => category.Id == id) ??
-        throw new InvalidOperationException($"La categoría con el id {id} no existe");
+        return _dbContext.Categories.FirstOrDefault(category => category.Id == id);
     }
-
-    public bool Save() => _dbContext.SaveChanges() >= 0;
-    
 
     public bool UpdateCategory(Category category)
     {
