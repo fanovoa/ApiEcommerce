@@ -1,3 +1,4 @@
+using ApiEcommerce.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiEcommerce.Data;
@@ -9,4 +10,5 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Product> Products { get; set; }
 }
