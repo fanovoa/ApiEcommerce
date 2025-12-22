@@ -3,7 +3,7 @@ using ApiEcommerce.Repository.IRepository;
 
 namespace ApiEcommerce.Repository;
 
-public class CateegoryRepository(ApplicationDbContext dbContext) : ICategoryRepository
+public class CategoryRepository(ApplicationDbContext dbContext) : ICategoryRepository
 {
 
     private readonly ApplicationDbContext _dbContext = dbContext;

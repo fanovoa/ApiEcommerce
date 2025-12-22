@@ -12,7 +12,8 @@ var dbConnectionString= builder.Configuration.GetConnectionString("ConexionSql")
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
 
 //Registar repository y automapper
-builder.Services.AddScoped<ICategoryRepository, CateegoryRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddAutoMapper(configuration =>
 {
