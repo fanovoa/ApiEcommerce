@@ -11,6 +11,15 @@ namespace ApiEcommerce.Controllers
         private readonly ICategoryRepository _categoryRepository = categoryRepository;
         private readonly IMapper _mapper = mapper;
 
+
+        private const string ID_NO_VALIDO ="El id debe ser mayor a cero";
+        private const string NO_EXISTE_CATEGORIA_CON_ID = "La categoría no existe con el id ";
+        private const string REQUEST_NO_VALIDO ="El cuerpo de la petición es inválido";
+        private const string CATEGORIA_YA_EXISTE="La categoría ya existe";
+        private const string ERROR_AL_ACTUALIZAR="Algo salió mal al actualizar el registro";
+        private const string ERROR_AL_ELIMINAR ="Algo salió mal al eliminar el registro";
+        private const string ERROR_AL_GUARDAR="Algo salió mal al guarda el registro";
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -36,12 +45,12 @@ namespace ApiEcommerce.Controllers
         public IActionResult GetCategory(int id )
         {
             if( id<= 0)
-             return BadRequest("El id debe ser mayor a cero");
+             return BadRequest(ID_NO_VALIDO);
 
             var category = _categoryRepository.GetCategory(id);
 
             if ( category == null)
-               return NotFound($"La categoría con el id {id} no existe");
+               return NotFound($"{NO_EXISTE_CATEGORIA_CON_ID} {id}");
 
             var categoryDto = _mapper.Map<CategoryDto>(category);
             return Ok(categoryDto);
@@ -59,20 +68,20 @@ namespace ApiEcommerce.Controllers
         {
             if( createCategoryDto == null)
             {
-                 ModelState.AddModelError("CustomError", "El cuerpo de la petición es inválido");
+                 ModelState.AddModelError("CustomError", REQUEST_NO_VALIDO);
                 return BadRequest(ModelState);
             }
 
             if (_categoryRepository.CategoryExists(createCategoryDto.Name))
             {
-                ModelState.AddModelError("CustomError", "La categoría ya existe");
+                ModelState.AddModelError("CustomError", CATEGORIA_YA_EXISTE);
                 return BadRequest(ModelState);
             }
 
             var category = _mapper.Map<Category>(createCategoryDto);
             if (!_categoryRepository.CreateCategory(category))
             {
-                ModelState.AddModelError("CustomError",$"Algo salió mal al guarda el registro {category.Name}");
+                ModelState.AddModelError("CustomError",$"{ERROR_AL_GUARDAR} {category.Name}");
                 return StatusCode(500, ModelState);
             }
 
@@ -92,19 +101,19 @@ namespace ApiEcommerce.Controllers
         {
             if( updateCategoryDto == null)
             {
-                 ModelState.AddModelError("CustomError", "El cuerpo de la petición es inválido");
+                 ModelState.AddModelError("CustomError", REQUEST_NO_VALIDO);
                 return BadRequest(ModelState);
             }
 
             if (!_categoryRepository.CategoryExists(id))
             {
-                return NotFound($"La categoría con el id {id} no existe");
+                return NotFound($"{NO_EXISTE_CATEGORIA_CON_ID} {id}");
             }
             
 
             if (_categoryRepository.CategoryExists(updateCategoryDto.Name))
             {
-                ModelState.AddModelError("CustomError", "La categoría ya existe");
+                ModelState.AddModelError("CustomError", CATEGORIA_YA_EXISTE);
                 return BadRequest(ModelState);
             }
 
@@ -112,7 +121,7 @@ namespace ApiEcommerce.Controllers
             category.Id= id;
             if (!_categoryRepository.UpdateCategory(category))
             {
-                ModelState.AddModelError("CustomError",$"Algo salió mal al actualizar el registro {category.Name}");
+                ModelState.AddModelError("CustomError",$"{ERROR_AL_ACTUALIZAR} {category.Name}");
                 return StatusCode(500, ModelState);
             }
 
@@ -132,19 +141,19 @@ namespace ApiEcommerce.Controllers
         {
             
             if( id<= 0)
-             return BadRequest("El id debe ser mayor a cero");
+             return BadRequest(ID_NO_VALIDO);
 
             if (!_categoryRepository.CategoryExists(id))
-                 return NotFound($"La categoría con el id {id} no existe");
+                 return NotFound($"{NO_EXISTE_CATEGORIA_CON_ID} {id}");
             
             var category = _categoryRepository.GetCategory(id);
 
             if( category == null)
-                return NotFound($"La categoría con el id {id} no existe");
+                 return NotFound($"{NO_EXISTE_CATEGORIA_CON_ID} {id}");
 
             if (!_categoryRepository.DeleteCategory(category))
             {
-                 ModelState.AddModelError("CustomError",$"Algo salió mal al eliminar el registro {category.Name}");
+                 ModelState.AddModelError("CustomError",$"{ERROR_AL_ELIMINAR} {category.Name}");
                 return StatusCode(500, ModelState);
             }
 

@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using ApiEcommerce.Data;
 using ApiEcommerce.Models;
 using ApiEcommerce.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiEcommerce.Repository;
 
@@ -44,14 +45,16 @@ public class ProductRepository(ApplicationDbContext dbContext) : IProductReposit
     {
         if (id <= 0) return null;
 
-        return _dbContext.Products.FirstOrDefault(product => product.ProductId == id);
+        return _dbContext.Products
+                .Include(product => product.Category)
+                .FirstOrDefault(product => product.ProductId == id);
     }
 
     public IReadOnlyCollection<Product> GetProductsForCategory(int categoryId)
     {
         if (categoryId <= 0) return [];
 
-        return [.. _dbContext.Products.Where(product => product.CategoryId == categoryId).OrderBy(product => product.Name)];
+        return [.. _dbContext.Products.Include(product => product.Category).Where(product => product.CategoryId == categoryId).OrderBy(product => product.Name)];
     }
 
     public bool ProductExists(int id)
@@ -68,12 +71,18 @@ public class ProductRepository(ApplicationDbContext dbContext) : IProductReposit
         return _dbContext.Products.Any(product => product.Name.ToLower().Trim() == name.ToLower().Trim());
     }
 
-    public IReadOnlyCollection<Product> SearchProduct(string name)
+    public IReadOnlyCollection<Product> SearchProducts(string searchTerm)
     {
         IQueryable<Product> query = _dbContext.Products;
 
-        if (!string.IsNullOrEmpty(name))
-            query = query.Where(product => product.Name.ToLower().Trim() == name.ToLower().Trim());
+        var searchTermLower = searchTerm.ToLower().Trim();
+
+        if (!string.IsNullOrEmpty(searchTerm))
+            query = query
+            .Include(product => product.Category)
+            .Where( product => product.Name.ToLower().Trim().Contains(searchTermLower) ||
+                    product.Description.ToLower().Trim().Contains(searchTermLower)
+            );
 
 
         return [.. query.OrderBy(product => product.Name)];
@@ -89,7 +98,7 @@ public class ProductRepository(ApplicationDbContext dbContext) : IProductReposit
 
     }
 
-    public IReadOnlyCollection<Product> GetProducts() => [.. _dbContext.Products.OrderBy(product => product.Name)];
+    public IReadOnlyCollection<Product> GetProducts() => [.. _dbContext.Products.Include(product => product.Category).OrderBy(product => product.Name)];
 
     public bool Save() => _dbContext.SaveChanges() >= 0;
 

@@ -7,7 +7,7 @@ public interface IProductRepository
 {
   public IReadOnlyCollection<Product> GetProducts();
   public IReadOnlyCollection<Product> GetProductsForCategory(int categoryId );
-  public IReadOnlyCollection<Product> SearchProduct( string name);
+  public IReadOnlyCollection<Product> SearchProducts( string searchTerm);
   public Product? GetProduct( int id);
   public bool BuyProduct(string name, int quantity);
   public bool ProductExists(int id);
