@@ -1,9 +1,12 @@
 
+using System.Text;
 using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,26 @@ builder.Services.AddAutoMapper(configuration =>
 {
     // Escanea todos los perfiles en el ensamblado de Program
     configuration.AddMaps(typeof(Program).Assembly);
+});
+var secretKey= builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
+if(string.IsNullOrEmpty(secretKey))
+    throw new InvalidOperationException("SecretKey no esta configurada");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken=true;
+    options.TokenValidationParameters= new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey=true,
+        IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ValidateIssuer =false,
+        ValidateAudience=true
+    };
 });
 
 builder.Services.AddControllers();
