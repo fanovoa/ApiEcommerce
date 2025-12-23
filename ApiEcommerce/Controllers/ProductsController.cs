@@ -59,7 +59,7 @@ namespace ApiEcommerce.Controllers
             if (product == null)
                 return NotFound($"{PRODUCTO_CON_ID_NO_EXISTE} {producId}");
 
-            return Ok(_mapper.Map<List<ProductDto>>(product));
+            return Ok(_mapper.Map<ProductDto>(product));
         }
 
         [HttpPost]

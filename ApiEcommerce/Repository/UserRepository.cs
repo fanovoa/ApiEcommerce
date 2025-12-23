@@ -14,7 +14,7 @@ namespace ApiEcommerce.Repository;
 public class UserRepository(ApplicationDbContext dbContext, IConfiguration configuration) : IUserRepository
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly string? _secrectKet = configuration.GetValue<string>("ApiSettings");
+    private readonly string? _secrectKet = configuration.GetValue<string>("ApiSettings:SecretKey");
 
     private const string USER_NAME_REQUIRED= "El username es requerido";
     private const string PASSWORD_REQUERED="La constraseña es requerida";
