@@ -7,6 +7,8 @@ using ApiEcommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,8 @@ builder.Services.AddAutoMapper(configuration =>
     // Escanea todos los perfiles en el ensamblado de Program
     configuration.AddMaps(typeof(Program).Assembly);
 });
+
+//Manejo de autorizacion en apis
 var secretKey= builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
 if(string.IsNullOrEmpty(secretKey))
     throw new InvalidOperationException("SecretKey no esta configurada");
@@ -42,16 +46,44 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey=true,
         IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ValidateIssuer =false,
-        ValidateAudience=true
+        ValidateAudience=false
     };
 });
 
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
+//Manejo de swagger
+builder.Services.AddSwaggerGen(options =>
+{
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "JWT Authorization usando Bearer",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    };
 
-builder.Services.AddSwaggerGen();
+    options.AddSecurityDefinition("Bearer", securityScheme);
 
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new List<string>()
+        }
+    });
+});
+//Manejo de CORS
 builder.Services.AddCors( options =>
 {
     options.AddPolicy(PoliceNames.AllowSpecificOrigin,
@@ -73,6 +105,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors(PoliceNames.AllowSpecificOrigin);
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

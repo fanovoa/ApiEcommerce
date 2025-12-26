@@ -7,7 +7,7 @@ namespace ApiEcommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     //[EnableCors(PoliceNames.AllowSpecificOrigin)]
     public class CategoriesController(ICategoryRepository categoryRepository, IMapper mapper) : ControllerBase
     {
@@ -23,6 +23,7 @@ namespace ApiEcommerce.Controllers
         private const string ERROR_AL_ELIMINAR ="Algo salió mal al eliminar el registro";
         private const string ERROR_AL_GUARDAR="Algo salió mal al guarda el registro";
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -40,7 +41,7 @@ namespace ApiEcommerce.Controllers
         }
 
 
-
+        [AllowAnonymous]
         [HttpGet("{id:int}", Name = "GetCategory")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

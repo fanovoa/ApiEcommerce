@@ -4,11 +4,13 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 
 namespace ApiEcommerce.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper) : ControllerBase
@@ -34,7 +36,7 @@ namespace ApiEcommerce.Controllers
         private const string ERROR_ELIMINAR_REGISTRO ="Algo salió mal al eliminar el registro";
         private const string ERROR_AL_COMPRAR="No se pudo comprar el producto o la cantidad solicitada es mayor al stock disponible";
 
-
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -45,6 +47,7 @@ namespace ApiEcommerce.Controllers
             return Ok(productsDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("{producId:int}", Name = "GetProduct")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
