@@ -5,6 +5,7 @@ using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -16,6 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 var dbConnectionString= builder.Configuration.GetConnectionString("ConexionSql");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
+
+//Manejo de caché
+builder.Services.AddResponseCaching(options =>
+{
+    options.MaximumBodySize = 1024 * 1024;
+    options.UseCaseSensitivePaths = true;
+});
+
 
 //Registar repository y automapper
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -50,7 +59,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers( option =>
+{
+  option.CacheProfiles.Add( CacheProfiles.Default10, CacheProfiles.Profile10);
+  option.CacheProfiles.Add(CacheProfiles.Default20, CacheProfiles.Profile20);
+}
+);
 
 builder.Services.AddEndpointsApiExplorer();
 //Manejo de swagger
@@ -105,6 +119,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors(PoliceNames.AllowSpecificOrigin);
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
