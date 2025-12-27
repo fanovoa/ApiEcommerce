@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <!-- AutoMapper -->
+    <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageReference Include="AutoMapper" Version="16.0.0" />
 
     <!-- Seguridad -->
@@ -31,9 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Constants\" />
+    <!-- <Folder Include="Constants\" />
     <Folder Include="Mapping\" />
-    <Folder Include="Models\Dtos\" />
+    <Folder Include="Models\Dtos\" /> -->
   </ItemGroup>
 
 </Project>

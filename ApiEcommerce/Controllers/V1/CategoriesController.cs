@@ -1,12 +1,14 @@
 using ApiEcommerce.Constants;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-namespace ApiEcommerce.Controllers
+namespace ApiEcommerce.Controllers.V1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     //[EnableCors(PoliceNames.AllowSpecificOrigin)]
@@ -28,6 +30,7 @@ namespace ApiEcommerce.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Obsolete("Este método está obsoleto, Use GetCategoriesById de la versión 2 en su lugar")]
         //[EnableCors("AllowSpecificOrigin")]
         public IActionResult GetCategories()
         {
@@ -40,7 +43,6 @@ namespace ApiEcommerce.Controllers
 
             return Ok(categoriesDto);
         }
-
 
         [AllowAnonymous]
         [HttpGet("{id:int}", Name = "GetCategory")]

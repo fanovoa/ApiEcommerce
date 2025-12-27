@@ -4,8 +4,8 @@ using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -70,6 +70,9 @@ builder.Services.AddEndpointsApiExplorer();
 //Manejo de swagger
 builder.Services.AddSwaggerGen(options =>
 {
+    // -------------------------------
+    // 🔐 Seguridad JWT (NET 10)
+    // -------------------------------
     var securityScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -82,7 +85,7 @@ builder.Services.AddSwaggerGen(options =>
 
     options.AddSecurityDefinition("Bearer", securityScheme);
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    var securityRequirement = new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -95,8 +98,49 @@ builder.Services.AddSwaggerGen(options =>
             },
             new List<string>()
         }
+    };
+
+    options.AddSecurityRequirement(securityRequirement);
+
+    // -------------------------------
+    // 📘 Swagger Docs - Versiones
+    // -------------------------------
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "API Ecommerce",
+        Description = "API para gestionar productos y usuarios"
+    });
+
+    options.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Version = "v2",
+        Title = "API Ecommerce V2",
+        Description = "API para gestionar productos y usuarios"
+    });
+
+    // -------------------------------
+    // 🔍 Filtro de endpoints por versión
+    // -------------------------------
+    options.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        return apiDesc.GroupName == docName;
     });
 });
+//Manejo de versionamiento de api's
+var apiVersioningBuilder = builder.Services.AddApiVersioning( options =>
+{
+  options.AssumeDefaultVersionWhenUnspecified =true;
+  options.DefaultApiVersion = new ApiVersion(1,0);
+  options.ReportApiVersions=true;
+  //options.ApiVersionReader=ApiVersionReader.Combine(new QueryStringApiVersionReader("api-version")); //?api-version
+});
+apiVersioningBuilder.AddApiExplorer(options =>
+{
+  options.GroupNameFormat = "'v'VVV"; ///v1,v2,v3
+  options.SubstituteApiVersionInUrl =true; //api/v{version}/products
+});
+
 //Manejo de CORS
 builder.Services.AddCors( options =>
 {
@@ -114,7 +158,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI( options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json","v1");
+        options.SwaggerEndpoint("/swagger/v2/swagger.json","v2");
+    });
 }
 
 app.UseHttpsRedirection();
