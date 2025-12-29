@@ -15,6 +15,7 @@
     <!-- Seguridad -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.1" />
 
     <!-- Entity Framework -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />

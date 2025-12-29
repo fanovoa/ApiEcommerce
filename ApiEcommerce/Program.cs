@@ -6,6 +6,7 @@ using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -36,6 +37,11 @@ builder.Services.AddAutoMapper(configuration =>
     // Escanea todos los perfiles en el ensamblado de Program
     configuration.AddMaps(typeof(Program).Assembly);
 });
+
+//Autenticacion por Identity
+builder.Services.AddIdentity<IdentityUser,IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 //Manejo de autorizacion en apis
 var secretKey= builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
