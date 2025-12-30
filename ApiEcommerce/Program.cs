@@ -172,6 +172,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+///Permitir archivos estaticos
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
 app.UseCors(PoliceNames.AllowSpecificOrigin);
 app.UseHttpsRedirection();

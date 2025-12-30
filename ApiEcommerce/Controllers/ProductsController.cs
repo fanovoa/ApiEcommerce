@@ -1,5 +1,4 @@
 
-using System.Net.Mail;
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
@@ -7,7 +6,6 @@ using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 
 namespace ApiEcommerce.Controllers
 {
@@ -73,7 +71,7 @@ namespace ApiEcommerce.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult CreateProduct([FromBody] CreateProductDto createProductDto)
+        public IActionResult CreateProduct([FromForm] CreateProductDto createProductDto)
         {
             if (createProductDto == null)
             {
@@ -95,8 +93,8 @@ namespace ApiEcommerce.Controllers
                 ModelState.AddModelError("CustomError", $"{CATEGORIA_NO_EXISTE} '{idCategory}'");
                 return BadRequest(ModelState);
             }
+            Product product = ConvertProduct(createProductDto,null);
 
-            var product = _mapper.Map<Product>(createProductDto);
             if (!_productRepository.CreateProduct(product))
             {
                 ModelState.AddModelError("CustomError", $"{ERROR_GUARDAR_REGISTRO} '{nameProduct}'");
@@ -107,6 +105,7 @@ namespace ApiEcommerce.Controllers
             var productDto = _mapper.Map<ProductDto>(createdProduct);
             return CreatedAtRoute("GetProduct", new { producId = product.ProductId }, productDto);
         }
+
 
 
         [HttpGet("searchProductByCategory/{categoryId:int}", Name = "GetProductsForCategory")]
@@ -186,7 +185,7 @@ namespace ApiEcommerce.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult UpdateProduct(int productId, [FromBody] UpdateProductDto updateProductDto)
+        public IActionResult UpdateProduct(int productId, [FromForm] UpdateProductDto updateProductDto)
         {
             if (updateProductDto == null)
             {
@@ -209,10 +208,8 @@ namespace ApiEcommerce.Controllers
                 return BadRequest(ModelState);
             }
 
-
-
-            var product = _mapper.Map<Product>(updateProductDto);
-            product.ProductId = productId;
+             Product product = ConvertProduct(updateProductDto, productId);
+          
 
             if (!_productRepository.UpdateProduct(product))
             {
@@ -249,6 +246,42 @@ namespace ApiEcommerce.Controllers
             return NoContent();
         }
 
+
+        private Product ConvertProduct(IProductDto  productDto, int? productId)
+        {
+            var product = _mapper.Map<Product>(productDto);
+            if(productId.HasValue)
+                   product.ProductId = productId.Value;
+
+            product.ImgUrl = "https://placehold.co/300x300";
+
+            if( productDto.Image == null)
+              return product;
+            
+            var (ImgUrl, ImgUrlLocal) =  GenerateImage( product.ProductId, productDto.Image);
+            product.ImgUrl= ImgUrl;
+            product.ImgUrlLocal= ImgUrlLocal;
+         
+            return product;
+        }
+
+        private (string ImgUrl, string ImgUrlLocal) GenerateImage(int productId,IFormFile image)
+        {
+            string fileName = productId + Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+            var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductsImages");
+            if (!Directory.Exists(imagesFolder))
+                Directory.CreateDirectory(imagesFolder);
+            
+            var filePath = Path.Combine(imagesFolder, fileName);
+            FileInfo file = new(filePath);
+            if (file.Exists)
+                file.Delete();
+
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            image.CopyTo(fileStream);
+            var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+            return ($"{baseUrl}/ProductsImages/{fileName}" , filePath );
+        }
 
         private static string CustomMessageBuy(string name, int quantity)
         {
