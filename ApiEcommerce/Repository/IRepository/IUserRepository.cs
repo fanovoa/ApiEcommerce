@@ -6,9 +6,9 @@ namespace ApiEcommerce.Repository.IRepository;
 
 public interface IUserRepository
 {
-    public IReadOnlyCollection<User> GetUsers();
-    public User? GetUser(int id);
+    public IReadOnlyCollection<ApplicationUser> GetUsers();
+    public ApplicationUser? GetUser(string id);
     public bool IsUniqueUser(string username);
     public Task<UserLoginResponseDto> Login( UserLoginDto userLoginDto);
-    public Task<User> Register(CreateUserDto createUserDto);
+    public Task<UserDataDto> Register(CreateUserDto createUserDto);
 }

@@ -2,6 +2,7 @@
 using System.Text;
 using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
+using ApiEcommerce.Models;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
@@ -39,7 +40,7 @@ builder.Services.AddAutoMapper(configuration =>
 });
 
 //Autenticacion por Identity
-builder.Services.AddIdentity<IdentityUser,IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser,IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
