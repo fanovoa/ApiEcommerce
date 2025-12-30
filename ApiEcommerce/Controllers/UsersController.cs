@@ -1,7 +1,7 @@
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +11,9 @@ namespace ApiEcommerce.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersionNeutral]
     [ApiController]
-    public class UsersController(IUserRepository userRepository, IMapper mapper) : ControllerBase
+    public class UsersController(IUserRepository userRepository) : ControllerBase
     {
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly IMapper _mapper = mapper;
 
         private const string ID_MAYOR_A_CERO = "El id debe ser mayor a cero";
         private const string USUARIO_CON_ID_NO_EXISTE = "El usuario no existe con el id";
@@ -30,7 +29,7 @@ namespace ApiEcommerce.Controllers
         public IActionResult GetUsers()
         {
             var users = _userRepository.GetUsers();
-            return Ok(_mapper.Map<List<UserDto>>(users));
+            return Ok(users.Adapt<List<UserDto>>());
         }
 
         [HttpGet("{userId}", Name = "GetUser")]
@@ -45,7 +44,7 @@ namespace ApiEcommerce.Controllers
             if (user == null)
                 return NotFound($"{USUARIO_CON_ID_NO_EXISTE} {userId}");
 
-            return Ok(_mapper.Map<UserDto>(user));
+            return Ok(user.Adapt<UserDto>());
         }
 
         [AllowAnonymous]

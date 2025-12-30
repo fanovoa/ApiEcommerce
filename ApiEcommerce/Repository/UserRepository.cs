@@ -6,7 +6,7 @@ using ApiEcommerce.Data;
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace ApiEcommerce.Repository;
 
 public class UserRepository
-    (ApplicationDbContext dbContext, IConfiguration configuration, UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager,IMapper mapper)
+    (ApplicationDbContext dbContext, IConfiguration configuration, UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager)
      : IUserRepository
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
@@ -22,7 +22,6 @@ public class UserRepository
 
     private readonly UserManager<ApplicationUser> _userManager =userManager;
     private readonly RoleManager<IdentityRole> _roleManager =roleManager;
-    private readonly IMapper _mapper =mapper;
 
     private const string USER_NAME_REQUIRED= "El username es requerido";
     private const string PASSWORD_REQUERED="La constraseña es requerida";
@@ -80,7 +79,7 @@ public class UserRepository
      
         await AssigUserRole(user, createUserDto.Role);
 
-        return _mapper.Map<UserDataDto>(user);
+        return user.Adapt<UserDataDto>();
         
     }
 
@@ -129,7 +128,7 @@ public class UserRepository
         return new UserLoginResponseDto()
         {
             Token = token,
-            User = _mapper.Map<UserDataDto>(user),
+            User = user.Adapt<UserDataDto>(),
             Message = message
         };
     }

@@ -6,6 +6,8 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -35,16 +37,16 @@ builder.Services.AddResponseCaching(options =>
 });
 
 
-//Registar repository y automapper
+//Registar repository y Mapster
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-builder.Services.AddAutoMapper(configuration =>
-{
-    // Escanea todos los perfiles en el ensamblado de Program
-    configuration.AddMaps(typeof(Program).Assembly);
-});
+//Configuración de Mapster
+var config = TypeAdapterConfig.GlobalSettings;
+config.Scan(typeof(Program).Assembly);
+builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 //Autenticacion por Identity
 builder.Services.AddIdentity<ApplicationUser,IdentityRole>()

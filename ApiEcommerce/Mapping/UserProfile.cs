@@ -1,21 +1,25 @@
 
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
-using AutoMapper;
+using Mapster;
 
 namespace ApiEcommerce.Mapping;
 
-public class UserProfile:Profile
+public class UserProfile: IRegister
 {
-    public UserProfile()
+    public void Register(TypeAdapterConfig config)
     {
-        CreateMap<User,UserDto>().ReverseMap();
-        CreateMap<User,CreateUserDto>().ReverseMap();
-        CreateMap<User,UserLoginDto>().ReverseMap();
-        CreateMap<User,UserLoginResponseDto>().ReverseMap();
-        CreateMap<ApplicationUser,UserDataDto>().ReverseMap();
-        CreateMap<ApplicationUser,UserDto>().ReverseMap();
-
-
+        config.NewConfig<User, UserDto>();
+        config.NewConfig<UserDto, User>();
+        config.NewConfig<User, CreateUserDto>();
+        config.NewConfig<CreateUserDto, User>();
+        config.NewConfig<User, UserLoginDto>();
+        config.NewConfig<UserLoginDto, User>();
+        config.NewConfig<User, UserLoginResponseDto>();
+        config.NewConfig<UserLoginResponseDto, User>();
+        config.NewConfig<ApplicationUser, UserDataDto>();
+        config.NewConfig<UserDataDto, ApplicationUser>();
+        config.NewConfig<ApplicationUser, UserDto>();
+        config.NewConfig<UserDto, ApplicationUser>();
     }
 }
