@@ -18,7 +18,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 var dbConnectionString= builder.Configuration.GetConnectionString("ConexionSql");
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+  options.UseSqlServer(dbConnectionString)
+  .UseSeeding((context, _) =>
+  {
+        var appContext = (ApplicationDbContext)context;
+        DataSeeder.SeedData(appContext);
+  })
+);
 
 //Manejo de caché
 builder.Services.AddResponseCaching(options =>

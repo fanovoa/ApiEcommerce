@@ -1,6 +1,7 @@
 
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
+using ApiEcommerce.Models.Dtos.Responses;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
 using AutoMapper;
@@ -35,6 +36,8 @@ namespace ApiEcommerce.Controllers
         private const string ERROR_ACTUALIZAR_REGISTRO ="Algo salió mal al actualizar el registro";
         private const string ERROR_ELIMINAR_REGISTRO ="Algo salió mal al eliminar el registro";
         private const string ERROR_AL_COMPRAR="No se pudo comprar el producto o la cantidad solicitada es mayor al stock disponible";
+        private const string PARAMETERS_NO_VALIDS="Los paramétros de paginación no son válidos";
+        private const string NO_PAGES_FOUND = "No hay más páginas disponibles";
 
         [AllowAnonymous]
         [HttpGet]
@@ -63,6 +66,36 @@ namespace ApiEcommerce.Controllers
                 return NotFound($"{PRODUCTO_CON_ID_NO_EXISTE} {producId}");
 
             return Ok(_mapper.Map<ProductDto>(product));
+        }
+
+         [AllowAnonymous]
+        [HttpGet("Paged", Name = "GetProductInPage")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult GetProductInPage([FromQuery] int pageNumber=1, [FromQuery] int pageSize =5)
+        {
+            if (pageNumber < 1 || pageSize< 1)
+                return BadRequest(PARAMETERS_NO_VALIDS);
+
+            var totalProduct = _productRepository.GetTotalProducts();
+            var totalPages= (int)Math.Ceiling((double)totalProduct/pageSize);
+
+            if(pageNumber>totalPages)
+                return NotFound(NO_PAGES_FOUND);
+
+
+            var products = _productRepository.GetProductsInPages(pageNumber, pageSize);
+            var productsDto =_mapper.Map<List<ProductDto>>(products);
+
+            return Ok(new PaginationResponse<ProductDto>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                Items = productsDto
+            });
         }
 
         [HttpPost]

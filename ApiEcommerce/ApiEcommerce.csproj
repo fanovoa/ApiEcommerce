@@ -33,10 +33,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- <Folder Include="Constants\" />
+  <ItemGroup><!-- <Folder Include="Constants\" />
     <Folder Include="Mapping\" />
     <Folder Include="Models\Dtos\" /> -->
+  
+    <Folder Include="Models\Dtos\Responses\" />
   </ItemGroup>
 
 </Project>

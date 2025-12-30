@@ -100,11 +100,17 @@ public class ProductRepository(ApplicationDbContext dbContext) : IProductReposit
     public IReadOnlyCollection<Product> GetProducts() => [.. _dbContext.Products.Include(product => product.Category).OrderBy(product => product.Name)];
 
     public bool Save() => _dbContext.SaveChanges() >= 0;
+    public IReadOnlyCollection<Product> GetProductsInPages(int PageNumber, int PageSize)
+    {
+        return [.. _dbContext.Products
+                .OrderBy(product => product.ProductId)
+                .Skip((PageNumber-1)*PageSize)
+                .Take(PageSize)
+                ];
+    }
 
+    public int GetTotalProducts() => _dbContext.Products.Count();
     private void UpdateProductDto(Product product) => _dbContext.Products.Update(product);
-
     private static bool IsLessThan(int quantity1, int quantity2) => quantity2 < quantity1;
-
     private static bool IsNull(Product? product) => product == null;
-
 }

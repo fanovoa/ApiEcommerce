@@ -6,6 +6,9 @@ namespace ApiEcommerce.Repository.IRepository;
 public interface IProductRepository
 {
   public IReadOnlyCollection<Product> GetProducts();
+  public IReadOnlyCollection<Product> GetProductsInPages(int PageNumber, int PageSize);
+  int GetTotalProducts();
+
   public IReadOnlyCollection<Product> GetProductsForCategory(int categoryId );
   public IReadOnlyCollection<Product> SearchProducts( string searchTerm);
   public Product? GetProduct( int id);
